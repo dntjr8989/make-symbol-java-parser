@@ -133,12 +133,12 @@ JNIEXPORT jstring JNICALL Java_ai_serenade_treesitter_TreeSitter_nodeString(
 
 JNIEXPORT jint JNICALL Java_ai_serenade_treesitter_TreeSitter_nodeEndByte(
     JNIEnv* env, jclass self, jobject node) {
-  return (jint)ts_node_end_byte(_unmarshalNode(env, node)) / 2;
+  return (jint)ts_node_end_byte(_unmarshalNode(env, node));
 }
 
 JNIEXPORT jint JNICALL Java_ai_serenade_treesitter_TreeSitter_nodeStartByte(
     JNIEnv* env, jclass self, jobject node) {
-  return (jint)ts_node_start_byte(_unmarshalNode(env, node)) / 2;
+  return (jint)ts_node_start_byte(_unmarshalNode(env, node));
 }
 
 JNIEXPORT jstring JNICALL Java_ai_serenade_treesitter_TreeSitter_nodeType(
@@ -240,4 +240,21 @@ JNIEXPORT void JNICALL Java_ai_serenade_treesitter_TreeSitter_treeDelete(
 JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_TreeSitter_treeRootNode(
     JNIEnv* env, jclass self, jlong tree) {
   return _marshalNode(env, ts_tree_root_node((TSTree*)tree));
+}
+
+JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getChildByFieldName(
+  JNIEnv* env, jobject thisObject, jstring name) {
+
+  if (name == NULL) {
+    return NULL;
+  }
+
+  uint32_t length = env->GetStringLength(name);
+  const char* childName = env->GetStringUTFChars(name, NULL);
+  TSNode node = _unmarshalNode(env, thisObject); //
+  TSNode child = ts_node_child_by_field_name(node, childName, length);
+  if (ts_node_is_null(child)) return NULL;
+  jobject childObject = _marshalNode(env, child); //
+  //__copyTree(env, thisObject, childObject); //
+  return childObject;
 }

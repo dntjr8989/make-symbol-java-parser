@@ -17,9 +17,9 @@ public class TreeParserService {
 
     public void makeSymbol(SourceCode sourceCode) throws UnsupportedEncodingException {
 
-        //if(!sourceCode.getPath().equals("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/java-baseball-main/src/main/java/application/baseball/Game.java")){
-        //    return;
-        //}
+        if(!sourceCode.getPath().equals("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/java-baseball-main/src/main/java/application/baseball/Game.java")){
+            return;
+        }
         System.out.println("sourceCode.getContent().length = " + sourceCode.getContent().length);
         System.out.println("sourceCode.getPath() = " + sourceCode.getPath());
         this.parse(sourceCode);
@@ -37,14 +37,14 @@ public class TreeParserService {
     }
 
     private void convertToSymbol(Node node, SourceCode sourceCode) {
-        //if(ClassService.isClass(sourceCode.getLanguage(), node.getType())){
-            //System.out.println("node.getChildByFieldName(\"name\").getNodeString() = " + node.getChildByFieldName("name").getNodeString());
+        if(ClassService.isClass(sourceCode.getLanguage(), node.getType())){
+            System.out.println("node.getChildByFieldName(\"name\").getNodeString() = " + node.getChildByFieldName("name").getNodeString());
             System.out.println("node.getType() = " + node.getType());
             System.out.println("node.getNodeString() = " + node.getNodeString());
             System.out.println("node.getStartByte() = " + node.getStartByte());
             System.out.println("node.getEndByte() = " + node.getEndByte());
             System.out.println("node String = " + byteArrayToString(sourceCode.getContent(), node.getStartByte(), node.getEndByte()));
-       // }
+        }
         for(int i=0; i<node.getChildCount(); i++){
             Node childNode = node.getChild(i);
             convertToSymbol(childNode, sourceCode);

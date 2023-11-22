@@ -18,8 +18,8 @@ public class ProjectParser {
         System.out.println("str.getBytes(StandardCharsets.UTF_16LE) = " + str.getBytes(StandardCharsets.UTF_16LE).length);
 */
         System.load("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/libjava-tree-sitter.dylib");
-        //Path root = Paths.get(("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/java-baseball-main"));
-        Path root = Paths.get(("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/C-master"));
+        Path root = Paths.get(("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/java-baseball-main"));
+        //Path root = Paths.get(("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/C-master"));
 
         TreeParserService treeParserService = new TreeParserService();
 
