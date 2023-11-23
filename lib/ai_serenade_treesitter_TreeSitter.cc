@@ -241,7 +241,7 @@ JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_TreeSitter_treeRootNode(
     JNIEnv* env, jclass self, jlong tree) {
   return _marshalNode(env, ts_tree_root_node((TSTree*)tree));
 }
-
+/*
 JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getChildByFieldName(
   JNIEnv* env, jobject thisObject, jstring name) {
 
@@ -257,4 +257,4 @@ JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getChildByFieldName(
   jobject childObject = _marshalNode(env, child); //
   //__copyTree(env, thisObject, childObject); //
   return childObject;
-}
+}*/

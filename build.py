@@ -35,7 +35,8 @@ def build(repositories, output_path="libjava-tree-sitter", arch=None, verbose=Fa
 
     source_paths = [
         os.path.join(here, "lib", "ai_serenade_treesitter_TreeSitter.cc"),
-        os.path.join(here, "lib", "ai_serenade_treesitter_Languages.cc")
+        os.path.join(here, "lib", "ai_serenade_treesitter_Languages.cc"),
+        os.path.join(here, "lib", "ai_serenade_treesitter_Node.cc")
     ]
 
     compiler = distutils.ccompiler.new_compiler()
