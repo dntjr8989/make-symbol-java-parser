@@ -27,6 +27,12 @@ static jfieldID _treeCursorNodeNameField;
 static jfieldID _treeCursorNodeStartByteField;
 static jfieldID _treeCursorNodeEndByteField;
 
+jclass _pointClass;
+jmethodID _pointConstructor;
+jfieldID _pointRowField;
+jfieldID _pointColumnField;
+jmethodID _pointOriginStaticMethod;
+
 #define _loadClass(VARIABLE, NAME)             \
   {                                            \
     jclass tmp;                                \
@@ -37,6 +43,21 @@ static jfieldID _treeCursorNodeEndByteField;
 
 #define _loadField(VARIABLE, CLASS, NAME, TYPE) \
   { VARIABLE = env->GetFieldID(CLASS, NAME, TYPE); }
+
+#define _getStaticMethod(CLASS, NAME, SIGNATURE) \
+  env->GetStaticMethodID(CLASS, NAME, SIGNATURE)
+
+#define _loadStaticMethod(VARIABLE, CLASS, NAME, SIGNATURE) \
+  { VARIABLE = _getStaticMethod(CLASS, NAME, SIGNATURE); }
+
+#define _loadConstructor(VARIABLE, CLASS, SIGNATURE) \
+  { VARIABLE = _getConstructor(CLASS, SIGNATURE); }
+
+#define _getConstructor(CLASS, SIGNATURE) \
+  _getMethod(CLASS, "<init>", SIGNATURE)
+
+#define _getMethod(CLASS, NAME, SIGNATURE) \
+  env->GetMethodID(CLASS, NAME, SIGNATURE)
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
   JNIEnv* env;
@@ -60,6 +81,12 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
   _loadField(_treeCursorNodeStartByteField, _treeCursorNodeClass, "startByte",
              "I");
   _loadField(_treeCursorNodeEndByteField, _treeCursorNodeClass, "endByte", "I");
+
+   _loadClass(_pointClass, "ai/serenade/treesitter/Point");
+   _loadConstructor(_pointConstructor, _pointClass, "(II)V");
+   _loadField(_pointRowField, _pointClass, "row", "I");
+   _loadField(_pointColumnField, _pointClass, "column", "I");
+   _loadStaticMethod(_pointOriginStaticMethod, _pointClass, "getOrigin", "()Lai/serenade/treesitter/Point;");
 
   return JNI_VERSION;
 }
@@ -93,6 +120,24 @@ TSNode _unmarshalNode(JNIEnv* env, jobject javaObject) {
       },
       (const void*)env->GetLongField(javaObject, _nodeIdField),
       (const TSTree*)env->GetLongField(javaObject, _nodeTreeField)};
+}
+
+jobject _marshalPoint(JNIEnv* env, TSPoint point) {
+  // Not sure why I need to divide by two, probably because of utf-16
+  return env->NewObject(
+    _pointClass,
+    _pointConstructor,
+    point.row,
+    point.column / 2
+  );
+}
+
+TSPoint _unmarshalPoint(JNIEnv* env, jobject pointObject) {
+  // Not sure why I need to multiply by two, probably because of utf-16
+  return (TSPoint) {
+    (uint32_t)env->GetIntField(pointObject, _pointRowField),
+    (uint32_t)env->GetIntField(pointObject, _pointColumnField) * 2,
+  };
 }
 
 jobject _marshalTreeCursorNode(JNIEnv* env, TreeCursorNode node) {

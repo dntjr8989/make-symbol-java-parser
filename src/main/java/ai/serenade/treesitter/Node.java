@@ -40,6 +40,9 @@ public class Node {
 
   public native Node getChildByFieldName(String name);
 
+  public native Point getStartPoint();
+  public native Point getEndPoint();
+
   public TreeCursor walk() {
     return new TreeCursor(TreeSitter.treeCursorNew(this));
   }

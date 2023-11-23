@@ -21,3 +21,19 @@ JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getChildByFieldName(
   //__copyTree(env, thisObject, childObject); //
   return childObject;
 }
+
+JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getStartPoint(
+  JNIEnv* env, jobject thisObject) {
+  TSNode node = _unmarshalNode(env, thisObject);
+  if (ts_node_is_null(node)) return env->CallStaticObjectMethod(_pointClass, _pointOriginStaticMethod);
+  TSPoint point = ts_node_start_point(node);
+  return _marshalPoint(env, point);
+}
+
+JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getEndPoint(
+  JNIEnv* env, jobject thisObject) {
+  TSNode node = _unmarshalNode(env, thisObject);
+  if (ts_node_is_null(node)) return env->CallStaticObjectMethod(_pointClass, _pointOriginStaticMethod);
+  TSPoint point = ts_node_end_point(node);
+  return _marshalPoint(env, point);
+}

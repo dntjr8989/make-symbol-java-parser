@@ -38,12 +38,16 @@ public class TreeParserService {
 
     private void convertToSymbol(Node node, SourceCode sourceCode) {
         if(ClassService.isClass(sourceCode.getLanguage(), node.getType())){
+            System.out.println("---------------------------------------------------------");
             System.out.println("node.getChildByFieldName(\"name\").getNodeString() = " + node.getChildByFieldName("name").getNodeString());
+            System.out.println("node.getStartPoint().toString() = " + node.getStartPoint().toString());
+            System.out.println("node.getEndPoint().toString() = " + node.getEndPoint().toString());
             System.out.println("node.getType() = " + node.getType());
             System.out.println("node.getNodeString() = " + node.getNodeString());
             System.out.println("node.getStartByte() = " + node.getStartByte());
             System.out.println("node.getEndByte() = " + node.getEndByte());
             System.out.println("node String = " + byteArrayToString(sourceCode.getContent(), node.getStartByte(), node.getEndByte()));
+            System.out.println("---------------------------------------------------------");
         }
         for(int i=0; i<node.getChildCount(); i++){
             Node childNode = node.getChild(i);
