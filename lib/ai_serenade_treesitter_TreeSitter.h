@@ -9,6 +9,13 @@
 extern "C" {
 #endif
 
+extern jclass _pointClass;
+extern jmethodID _pointConstructor;
+extern jfieldID _pointRowField;
+extern jfieldID _pointColumnField;
+extern jmethodID _pointOriginStaticMethod;
+
+
 jobject _marshalNode(JNIEnv* env, TSNode node);
 
 TSNode _unmarshalNode(JNIEnv* env, jobject javaObject);
@@ -16,12 +23,6 @@ TSNode _unmarshalNode(JNIEnv* env, jobject javaObject);
 jobject _marshalPoint(JNIEnv* env, TSPoint point);
 
 TSPoint _unmarshalPoint(JNIEnv* env, jobject pointObject);
-
-extern jclass _pointClass;
-extern jmethodID _pointConstructor;
-extern jfieldID _pointRowField;
-extern jfieldID _pointColumnField;
-extern jmethodID _pointOriginStaticMethod;
 
 /*
  * Class:     ai_serenade_treesitter_TreeSitter

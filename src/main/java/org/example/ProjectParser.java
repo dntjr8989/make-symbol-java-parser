@@ -1,5 +1,8 @@
 package org.example;
 
+import org.dto.BlockDTO;
+import org.dto.ClassDTO;
+import org.dto.PackageDTO;
 import org.example.parser.service.TreeParserService;
 import org.example.sourceCode.SourceCode;
 import org.example.sourceCode.service.SourceCodeService;
@@ -30,11 +33,25 @@ public class ProjectParser {
         sourceCodeList.forEach(
                 sourceCode -> {
                     try {
-                        treeParserService.makeSymbol(sourceCode);
+                        treeParserService.makeSymbol(0L, sourceCode);
                     } catch (UnsupportedEncodingException e) {
                         throw new RuntimeException(e);
                     }
                 }
         );
+        List<PackageDTO> packageDTOList = treeParserService.getPackageDTOList();
+        packageDTOList.forEach(packageDTO -> {
+            System.out.println("packageDTO = " + packageDTO);
+        });
+
+        List<ClassDTO> classDTOList = treeParserService.getClassDTOList();
+        classDTOList.forEach(classDTO -> {
+            System.out.println("classDTO = " + classDTO);
+        });
+
+        List<BlockDTO> blockDTOList = treeParserService.getBlockDTOList();
+        blockDTOList.forEach(blockDTO -> {
+            System.out.println("blockDTO = " + blockDTO);
+        });
     }
 }

@@ -7,7 +7,7 @@ import application.model.Player;
 import application.view.Input;
 import application.view.Output;
 
-public class Game {
+public class Game extends Object{
     private final Computer computer;
     private final Player player;
     private final Input input;

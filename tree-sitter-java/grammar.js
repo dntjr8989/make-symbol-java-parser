@@ -764,7 +764,7 @@ module.exports = grammar({
     )),
 
     class_declaration: $ => seq(
-      optional($.modifiers),
+      optional(field('modifiers', $.modifiers)), //field 추가
       'class',
       field('name', $.identifier),
       optional(field('type_parameters', $.type_parameters)),
@@ -811,7 +811,7 @@ module.exports = grammar({
 
     super_interfaces: $ => seq(
       'implements',
-      $.type_list
+      field('implement_list', $.type_list) //필드 추가
     ),
 
     type_list: $ => seq(
