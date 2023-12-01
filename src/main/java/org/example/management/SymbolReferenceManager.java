@@ -7,18 +7,18 @@ import java.util.List;
 
 public class SymbolReferenceManager {
 
-    private final List<SymbolReferenceDTO> symbolReferencdDTOList;
+    private final List<SymbolReferenceDTO> symbolReferenceDTOList;
 
     public SymbolReferenceManager() {
-        this.symbolReferencdDTOList = new ArrayList<>();
+        this.symbolReferenceDTOList = new ArrayList<>();
     }
 
     public List<SymbolReferenceDTO> getSymbolReferenceDTOList() {
-        return this.symbolReferencdDTOList;
+        return this.symbolReferenceDTOList;
     }
 
     public void symbolReferenceListClear() {
-        this.symbolReferencdDTOList.clear();
+        this.symbolReferenceDTOList.clear();
     }
 
     public SymbolReferenceDTO buildSymbolReference(Long symbolReferenceId, Long symbolStatusId, String src_path) {
@@ -28,7 +28,7 @@ public class SymbolReferenceManager {
         symbolReferenceDTO.setSymbolStatusId(symbolStatusId);
         symbolReferenceDTO.setSrcPath(src_path);
 
-        this.symbolReferencdDTOList.add(symbolReferenceDTO);
+        this.symbolReferenceDTOList.add(symbolReferenceDTO);
 
         return symbolReferenceDTO;
     }

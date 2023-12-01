@@ -94,6 +94,7 @@ public class TreeParserService {
                         sourceCode);
                 symbolIds.put("class", symbolIds.get("class")+1);
                 parentBlockDTOList[i] = parentBlockDTO;
+
             }
             else if(BlockManager.isBlock(language, type)){
                 BlockDTO blockDTO = blockManager.buildBlock(symbolIds.get("block"), parentBlockDTO.getDepth()+1,

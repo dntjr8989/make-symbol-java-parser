@@ -43,6 +43,8 @@ public class Node {
   public native Point getStartPoint();
   public native Point getEndPoint();
 
+  public native Node getParent();
+
   public TreeCursor walk() {
     return new TreeCursor(TreeSitter.treeCursorNew(this));
   }

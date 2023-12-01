@@ -31,6 +31,14 @@ JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getStartPoint
 JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getEndPoint
   (JNIEnv *, jobject);
 
+/*
+ * Class:     ai_serenade_treesitter_Node
+ * Method:    getParent
+ * Signature: ()Lai/serenade/treesitter/Node;
+ */
+JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getParent
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

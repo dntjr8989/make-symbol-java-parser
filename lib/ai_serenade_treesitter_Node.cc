@@ -37,3 +37,13 @@ JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getEndPoint(
   TSPoint point = ts_node_end_point(node);
   return _marshalPoint(env, point);
 }
+
+JNIEXPORT jobject JNICALL Java_ai_serenade_treesitter_Node_getParent(
+  JNIEnv* env, jobject thisObject) {
+  TSNode node = _unmarshalNode(env, thisObject);
+  TSNode parent = ts_node_parent(node);
+  if (ts_node_is_null(parent)) return NULL;
+  jobject parentObject = _marshalNode(env, parent);
+  //__copyTree(env, thisObject, parentObject);
+  return parentObject;
+}
