@@ -39,20 +39,30 @@ public class ClassManager {
         String implementClass = "";
         String modifierKeyword = "";
         String accessModifierKeyword = "default";
-
-        Node identifierNode = node.getChildByFieldName("name");
-        String className = ByteToString.byteArrayToString(sourceCode.getContent(), identifierNode.getStartByte(), identifierNode.getEndByte());
-
+        String className = "";
         String classType;
 
+        Node identifierNode = node.getChildByFieldName("name");
+        if(identifierNode != null) {
+            className = ByteToString.byteArrayToString(sourceCode.getContent(), identifierNode.getStartByte(), identifierNode.getEndByte());
+        }
+        //typedef 경우 struct 이름 재정의 됨
+        Node parentNode = node.getParent();
+        Node declaratorNode = parentNode.getChildByFieldName("declarator");
+        if(parentNode.getType().equals("type_definition") && declaratorNode != null){
+            className = ByteToString.byteArrayToString(sourceCode.getContent(), declaratorNode.getStartByte(), declaratorNode.getEndByte());
+        }
+
         Node modifierNode = node.getChildByFieldName("modifiers");
-        String[] modifiers = ByteToString.byteArrayToString(sourceCode.getContent(), modifierNode.getStartByte(), modifierNode.getEndByte()).split(" ");
-        for(String modifier : modifiers){
-            if(modifier.equals("public") || modifier.equals("protected") || modifier.equals("private") ){
-                accessModifierKeyword = modifier;
-            }
-            else{
-                modifierKeyword = modifier;
+        if(modifierNode != null){
+            String[] modifiers = ByteToString.byteArrayToString(sourceCode.getContent(), modifierNode.getStartByte(), modifierNode.getEndByte()).split(" ");
+            for(String modifier : modifiers){
+                if(modifier.equals("public") || modifier.equals("protected") || modifier.equals("private") ){
+                    accessModifierKeyword = modifier;
+                }
+                else{
+                    modifierKeyword = modifier;
+                }
             }
         }
         Node interfacesNode = node.getChildByFieldName("interfaces");

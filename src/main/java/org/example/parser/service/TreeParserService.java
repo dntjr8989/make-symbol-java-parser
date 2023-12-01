@@ -51,9 +51,9 @@ public class TreeParserService {
 
     public void makeSymbol(Long symbolStatusId, SourceCode sourceCode) throws UnsupportedEncodingException {
 
-        if(!sourceCode.getPath().equals("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/java-baseball-main/src/main/java/application/baseball/Game.java")){
-            return;
-        }
+        //if(!sourceCode.getPath().equals("/Users/kws/tmax_cloud/tree-sitter/tree-sitter-parser/src/main/resources/java-baseball-main/src/main/java/application/baseball/Game.java")){
+         //   return;
+        //}
         System.out.println("sourceCode.getContent().length = " + sourceCode.getContent().length);
         System.out.println("sourceCode.getPath() = " + sourceCode.getPath());
         this.parse(symbolStatusId, sourceCode);
