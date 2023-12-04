@@ -29,7 +29,6 @@ public class MemberVariableDeclarationDTO extends VariableDeclarationDTO {
                 ", belongedClassId : " + getBelongedClassId() +
                 ", importId : " + getImportId() +
                 ", name : '" + getName() + '\'' +
-                "', nodeType: '" + getNode().getType() +
                 ", modifier : '" + getModifier() + '\'' +
                 ", accessModifier : '" + getAccessModifier() + '\'' +
                 ", type : '" + getType() + '\'' +

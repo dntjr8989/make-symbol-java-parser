@@ -6,13 +6,16 @@ import ai.serenade.treesitter.Parser;
 import ai.serenade.treesitter.Tree;
 import org.dto.BlockDTO;
 import org.dto.ClassDTO;
+import org.dto.MemberVariableDeclarationDTO;
 import org.dto.PackageDTO;
+import org.dto.StmtVariableDeclarationDTO;
 import org.dto.SymbolReferenceDTO;
 import org.example.config.GeneratorIdentifier;
 import org.example.management.BlockManager;
 import org.example.management.ClassManager;
 import org.example.management.PackageManager;
 import org.example.management.SymbolReferenceManager;
+import org.example.management.VariableManager;
 import org.example.sourceCode.SourceCode;
 
 import java.io.UnsupportedEncodingException;
@@ -33,6 +36,8 @@ public class TreeParserService {
 
     private final ClassManager classManager = new ClassManager();
 
+    private final VariableManager variableManager = new VariableManager();
+
 
     public List<SymbolReferenceDTO> getSymbolReferenceDTOList() {
         return symbolReferenceManager.getSymbolReferenceDTOList();
@@ -48,6 +53,10 @@ public class TreeParserService {
     public List<PackageDTO> getPackageDTOList() {
         return packageManager.getPackageDTOList();
     }
+
+    public List<MemberVariableDeclarationDTO> getMemberVariableDeclarationDTO(){return variableManager.getMemberVariableDeclarationDTOList();}
+
+    public List<StmtVariableDeclarationDTO> getStmtVariableDeclarationDTO(){return variableManager.getStmtVariableDeclarationDTOList();}
 
     public void makeSymbol(Long symbolStatusId, SourceCode sourceCode) throws UnsupportedEncodingException {
 
@@ -101,6 +110,20 @@ public class TreeParserService {
                         parentBlockDTO.getBlockId(), node.getType(), node, parentBlockDTO.getSymbolReferenceId());
                 symbolIds.put("block", symbolIds.get("block")+1);
                 parentBlockDTOList[i] = blockDTO;
+            }
+
+            else if(VariableManager.isMemberVariableDecl(language, type)){
+                ClassDTO belongedClassDTO = classManager.getClassDTOList().get(classManager.getClassDTOList().size() - 1);
+                MemberVariableDeclarationDTO memberVarDeclDTO = variableManager.buildMemberVariableDeclDTO(symbolIds.get("member_var_decl"), parentBlockDTO.getBlockId(),
+                        belongedClassDTO.getClassId(), childNode, sourceCode);
+                symbolIds.put("member_var_decl", symbolIds.get("member_var_decl") + 1);
+                parentBlockDTOList[i] = parentBlockDTO;
+            }
+
+            else if(VariableManager.isStmtVariableDecl(language, type)){
+                StmtVariableDeclarationDTO stmtVarDecl = variableManager.buildStmtVariableDeclDTO(symbolIds.get("stmt_var_decl"), parentBlockDTO.getBlockId(), childNode, sourceCode);
+                symbolIds.put("stmt_var_decl", symbolIds.get("stmt_var_decl") + 1);
+                parentBlockDTOList[i] = parentBlockDTO;
             }
             else{
                 parentBlockDTOList[i] = parentBlockDTO;

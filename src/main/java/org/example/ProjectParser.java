@@ -2,7 +2,9 @@ package org.example;
 
 import org.dto.BlockDTO;
 import org.dto.ClassDTO;
+import org.dto.MemberVariableDeclarationDTO;
 import org.dto.PackageDTO;
+import org.dto.StmtVariableDeclarationDTO;
 import org.example.parser.service.TreeParserService;
 import org.example.sourceCode.SourceCode;
 import org.example.sourceCode.service.SourceCodeService;
@@ -52,6 +54,16 @@ public class ProjectParser {
         List<BlockDTO> blockDTOList = treeParserService.getBlockDTOList();
         blockDTOList.forEach(blockDTO -> {
             System.out.println("blockDTO = " + blockDTO);
+        });
+
+        List<MemberVariableDeclarationDTO> memberVariableDeclarationDTOList = treeParserService.getMemberVariableDeclarationDTO();
+        memberVariableDeclarationDTOList.forEach(memberVariableDeclarationDTO -> {
+            System.out.println("memberVariableDeclarationDTO = " + memberVariableDeclarationDTO);
+        });
+
+        List<StmtVariableDeclarationDTO> stmtVariableDeclarationDTOList = treeParserService.getStmtVariableDeclarationDTO();
+        stmtVariableDeclarationDTOList.forEach(stmtVariableDeclarationDTO -> {
+            System.out.println("stmtVariableDeclarationDTO = " + stmtVariableDeclarationDTO);
         });
     }
 }

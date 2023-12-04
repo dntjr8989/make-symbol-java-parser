@@ -900,7 +900,7 @@ module.exports = grammar({
     ),
 
     field_declaration: $ => seq(
-      optional($.modifiers),
+      optional(field('modifiers', $.modifiers)), //변경
       field('type', $._unannotated_type),
       $._variable_declarator_list,
       ';'

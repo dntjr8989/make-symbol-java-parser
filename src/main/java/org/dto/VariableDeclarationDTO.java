@@ -16,8 +16,6 @@ public class VariableDeclarationDTO {
     private String modifier;
     private String accessModifier;
     private String type;
-    private String variableType;
-    private Node node;
     private Optional<Node> initializer;
     private Position position;
 
@@ -93,21 +91,6 @@ public class VariableDeclarationDTO {
         this.type = type;
     }
 
-    public String getVariableType() {
-        return variableType;
-    }
-
-    public void setVariableType(String variableType) {
-        this.variableType = variableType;
-    }
-
-    public Node getNode() {
-        return node;
-    }
-
-    public void setNode(Node node) {
-        this.node = node;
-    }
 
     public Optional<Node> getInitializer() {
         return initializer;
@@ -146,7 +129,6 @@ public class VariableDeclarationDTO {
                 ", fullQualifiedNameId : " + fullQualifiedNameId +
                 ", isFullQualifiedNameIdFromDB : " + isFullQualifiedNameIdFromDB +
                 ", name : '" + name + '\'' +
-                "', nodeType: '" + node.getType() +
                 ", modifier : '" + modifier + '\'' +
                 ", accessModifier : '" + accessModifier + '\'' +
                 ", type : '" + type + '\'' +

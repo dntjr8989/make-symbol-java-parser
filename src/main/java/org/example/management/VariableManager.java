@@ -2,7 +2,9 @@ package org.example.management;
 
 import ai.serenade.treesitter.Node;
 import org.dto.MemberVariableDeclarationDTO;
+import org.dto.Position;
 import org.dto.StmtVariableDeclarationDTO;
+import org.example.sourceCode.SourceCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,13 +19,13 @@ public class VariableManager {
     public static Map<String, List<String>> memberVariableDeclTypeMap = new HashMap<String, List<String>>(){{
         put("java", Arrays.asList("field_declaration"));
         put("c", Arrays.asList("field_declaration"));
-        put("python", Arrays.asList());
+        put("python", Arrays.asList("assignment"));
     }};
 
     public static Map<String, List<String>> stmtVariableDeclTypeMap = new HashMap<String, List<String>>(){{
         put("java", Arrays.asList("local_variable_declaration"));
         put("c", Arrays.asList("declaration"));
-        put("python", Arrays.asList());
+        put("python", Arrays.asList("assignment"));
     }};
     private final List<MemberVariableDeclarationDTO> memberVariableDeclarationDTOList;
     private final List<StmtVariableDeclarationDTO> stmtVariableDeclarationDTOList;
@@ -41,154 +43,161 @@ public class VariableManager {
         return this.stmtVariableDeclarationDTOList;
     }
 
+    public static boolean isMemberVariableDecl(String language, String nodeType){
+        //파이썬은 따로 처리해줘야함(부모 확인)
+        if(!memberVariableDeclTypeMap.containsKey(language)){
+            return false;
+        }
+        List<String> nodeTypeList = memberVariableDeclTypeMap.get(language);
+        return nodeTypeList.contains(nodeType);
+    }
+
+    public static boolean isStmtVariableDecl(String language, String nodeType){
+        //파이썬 따로 처리해줘야함
+        if(!stmtVariableDeclTypeMap.containsKey(language)){
+            return false;
+        }
+        List<String> nodeTypeList = stmtVariableDeclTypeMap.get(language);
+        return nodeTypeList.contains(nodeType);
+    }
+
     public void variableDeclarationListClear() {
         this.memberVariableDeclarationDTOList.clear();
         this.stmtVariableDeclarationDTOList.clear();
     }
-/*
-    public MemberVariableDeclarationDTO buildVariableDeclInMemberField(Long variableId, Long blockId,
-            Long belongedClassId, Node node) {
+
+    public MemberVariableDeclarationDTO buildMemberVariableDeclDTO(Long variableId, Long blockId,
+                                                                       Long belongedClassId, Node node, SourceCode sourceCode) {
 
         MemberVariableDeclarationDTO variableDeclarationDTO = new MemberVariableDeclarationDTO();
 
-        FieldDeclaration fieldDeclaration = (FieldDeclaration) node;
 
         String modifierKeyword = "";
         String accessModifierKeyword = "";
-        Type variableType = null;
         String type = "";
         String name = "";
         Optional<Node> initializer = Optional.empty();
 
         // 변수 제어자
-        NodeList<Modifier> modifiers = fieldDeclaration.getModifiers();
-        for (Modifier modifier : modifiers) {
-            // 접근 제어자 분별
-            if (modifier.getKeyword().equals(Modifier.Keyword.DEFAULT) ||
-                    modifier.getKeyword().equals(Modifier.Keyword.PUBLIC) ||
-                    modifier.getKeyword().equals(Modifier.Keyword.PROTECTED) ||
-                    modifier.getKeyword().equals(Modifier.Keyword.PRIVATE)) {
-                accessModifierKeyword = modifier.getKeyword().asString();
-            } else {
-                modifierKeyword = modifier.getKeyword().asString();
-            }
-        }
-        // 변수 이름, 타입
-        NodeList<VariableDeclarator> variableDeclarators = fieldDeclaration.getVariables();
-        for (VariableDeclarator variableDeclarator : variableDeclarators) {
-            variableType = variableDeclarator.getType();
-            // type =
-            // variableType.getChildNodes().stream().collect(Collectors.toList()).toString();
-            type = variableDeclarator.getType().asString();
-            name = variableDeclarator.getName().asString();
+        Node modifierNode = node.getChildByFieldName("modifiers");
 
-            Expression initializerExpr = variableDeclarator.getInitializer().isPresent()
-                    ? variableDeclarator.getInitializer().get()
-                    : null;
-            if (initializerExpr != null) {
-                List<Node> initializerChildren = initializerExpr.getChildNodes();
-                for (Node child : initializerChildren) {
-                    if (child.getMetaModel().getTypeName().equals("SimpleName")) {
-                        initializer = Optional.of(child);
-                    }
+        if(modifierNode != null){
+            String[] modifiers = ByteToString.byteArrayToString(sourceCode.getContent(), modifierNode.getStartByte(), modifierNode.getEndByte()).split(" ");
+            for(String modifier : modifiers){
+                if(modifier.equals("public") || modifier.equals("protected") || modifier.equals("private") ){
+                    accessModifierKeyword = modifier;
+                }
+                else{
+                    modifierKeyword = modifier;
                 }
             }
         }
+
+        // 변수 이름, 타입
+        Node typeNode = node.getChildByFieldName("type");
+        if(typeNode != null){
+            type = ByteToString.byteArrayToString(sourceCode.getContent(), typeNode.getStartByte(), typeNode.getEndByte());
+        }
+        List<String> t = this.getTypeAndName(type, name, node, sourceCode);
+        type = t.get(0); name = t.get(1);
 
         variableDeclarationDTO.setVariableId(variableId);
         variableDeclarationDTO.setBlockId(blockId);
         variableDeclarationDTO.setBelongedClassId(belongedClassId);
         // variableDeclarationDTO.setTypeClassId(1L); // 일단 1로 한다
         variableDeclarationDTO.setImportId(1L); // 일단 1로 한다
-        variableDeclarationDTO.setVariableType(variableType);
         variableDeclarationDTO.setType(type);
         variableDeclarationDTO.setName(name);
         variableDeclarationDTO.setModifier(modifierKeyword);
         variableDeclarationDTO.setAccessModifier(accessModifierKeyword);
         variableDeclarationDTO.setInitializer(initializer);
-        variableDeclarationDTO.setNode(node);
         variableDeclarationDTO.setPosition(
                 new Position(
-                        node.getRange().get().begin.line,
-                        node.getRange().get().begin.column,
-                        node.getRange().get().end.line,
-                        node.getRange().get().end.column));
+                        node.getStartPoint().getRow(),
+                        node.getStartPoint().getColumn(),
+                        node.getEndPoint().getRow(),
+                        node.getEndPoint().getColumn()));
 
         memberVariableDeclarationDTOList.add(variableDeclarationDTO);
         return variableDeclarationDTO;
     }
 
-    public StmtVariableDeclarationDTO buildVariableDeclInMethod(Long variableId, Long blockId, Node node) {
+    public StmtVariableDeclarationDTO buildStmtVariableDeclDTO(Long variableId, Long blockId, Node node, SourceCode sourceCode) {
 
         StmtVariableDeclarationDTO variableDeclarationDTO = new StmtVariableDeclarationDTO();
-        VariableDeclarationExpr variableDeclarationExpr = (VariableDeclarationExpr) node;
 
         String modifierKeyword = "";
         String accessModifierKeyword = "";
-        Type variableType = null;
         String type = "";
         String name = "";
         Optional<Node> initializer = Optional.empty();
 
         // 변수 제어자
-        NodeList<Modifier> modifiers = variableDeclarationExpr.getModifiers();
-        for (Modifier modifier : modifiers) {
-            // 접근 제어자 분별
-            if (modifier.getKeyword().equals(Modifier.Keyword.DEFAULT) ||
-                    modifier.getKeyword().equals(Modifier.Keyword.PUBLIC) ||
-                    modifier.getKeyword().equals(Modifier.Keyword.PROTECTED) ||
-                    modifier.getKeyword().equals(Modifier.Keyword.PRIVATE)) {
-                accessModifierKeyword = modifier.getKeyword().asString();
-            } else {
-                modifierKeyword = modifier.getKeyword().asString();
-            }
-        }
-        // 변수 이름, 타입
-        NodeList<VariableDeclarator> variableDeclarators = variableDeclarationExpr.getVariables();
-        for (VariableDeclarator variableDeclarator : variableDeclarators) {
-            variableType = variableDeclarator.getType();
-            // type =
-            // variableType.getChildNodes().stream().collect(Collectors.toList()).toString();
-            type = variableDeclarator.getType().asString();
-            name = variableDeclarator.getName().asString();
-            // List<Node> childNodes = variableDeclarator.getChildNodes();
-            // for (Node childNode : childNodes) {
-            // String childNodeTypeName = childNode.getMetaModel().getTypeName();
-            //
-            // }
-            Expression initializerExpr = variableDeclarator.getInitializer().isPresent()
-                    ? variableDeclarator.getInitializer().get()
-                    : null;
-            if (initializerExpr != null) {
-                List<Node> initializerChildren = initializerExpr.getChildNodes();
-                for (Node child : initializerChildren) {
-                    if (child.getMetaModel().getTypeName().equals("SimpleName")) {
-                        initializer = Optional.of(child);
-                    }
+        Node modifierNode = node.getChildByFieldName("modifiers");
+        if(modifierNode != null){
+            String[] modifiers = ByteToString.byteArrayToString(sourceCode.getContent(), modifierNode.getStartByte(), modifierNode.getEndByte()).split(" ");
+            for(String modifier : modifiers){
+                if(modifier.equals("public") || modifier.equals("protected") || modifier.equals("private") ){
+                    accessModifierKeyword = modifier;
+                }
+                else{
+                    modifierKeyword = modifier;
                 }
             }
         }
+        // 변수 이름, 타입
+        Node typeNode = node.getChildByFieldName("type");
+        if(typeNode != null){
+            type = ByteToString.byteArrayToString(sourceCode.getContent(), typeNode.getStartByte(), typeNode.getEndByte());
+        }
+        List<String> t = this.getTypeAndName(type, name, node, sourceCode);
+        type = t.get(0); name = t.get(1);
 
         variableDeclarationDTO.setVariableId(variableId);
         variableDeclarationDTO.setBlockId(blockId);
         // variableDeclarationDTO.setTypeClassId(1L); // 일단 1로 한다
         variableDeclarationDTO.setImportId(1L); // 일단 1로 한다
-        variableDeclarationDTO.setVariableType(variableType);
         variableDeclarationDTO.setType(type);
         variableDeclarationDTO.setName(name);
         variableDeclarationDTO.setModifier(modifierKeyword);
         variableDeclarationDTO.setAccessModifier(accessModifierKeyword);
         variableDeclarationDTO.setInitializer(initializer);
-        variableDeclarationDTO.setNode(node);
         variableDeclarationDTO.setPosition(
                 new Position(
-                        node.getRange().get().begin.line,
-                        node.getRange().get().begin.column,
-                        node.getRange().get().end.line,
-                        node.getRange().get().end.column));
+                        node.getStartPoint().getRow(),
+                        node.getStartPoint().getColumn(),
+                        node.getEndPoint().getRow(),
+                        node.getEndPoint().getColumn()));
 
         stmtVariableDeclarationDTOList.add(variableDeclarationDTO);
         return variableDeclarationDTO;
-    }*/
+    }
 
+    private List<String> getTypeAndName(String type, String name, Node node, SourceCode sourceCode){
+        Node declaratorNode = node.getChildByFieldName("declarator");
+        List<String> t = new ArrayList<>();
+        t.add(""); t.add("");
+        if(declaratorNode != null){
+            if(declaratorNode.getType().equals("array_declarator")){
+                return this.getTypeAndName(type+"[]", name, declaratorNode, sourceCode);
+            }
+            else if(declaratorNode.getType().equals("identifier")){
+                name = ByteToString.byteArrayToString(sourceCode.getContent(), declaratorNode.getStartByte(), declaratorNode.getEndByte());
+                t.set(0, type); t.add(1, name);
+                return t;
+            }
+            else{
+                Node nameNode = declaratorNode.getChildByFieldName("name");
+                if(nameNode != null){
+                    name = ByteToString.byteArrayToString(sourceCode.getContent(), nameNode.getStartByte(), nameNode.getEndByte());
+                    t.set(0, type); t.add(1, name);
+                    return t;
+                }
+                else{
+                    return this.getTypeAndName(type, name, declaratorNode, sourceCode);
+                }
+            }
+        }
+        return t;
+    }
 }

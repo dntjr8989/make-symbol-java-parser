@@ -15,7 +15,6 @@ public class StmtVariableDeclarationDTO extends VariableDeclarationDTO {
                 ", blockId : " + getBlockId() +
                 ", importId : " + getImportId() +
                 ", name : '" + getName() + '\'' +
-                "', nodeType: '" + getNode().getType() +
                 ", modifier : '" + getModifier() + '\'' +
                 ", accessModifier : '" + getAccessModifier() + '\'' +
                 ", type : '" + getType() + '\'' +
