@@ -181,7 +181,7 @@ public class VariableManager {
             if(declaratorNode.getType().equals("array_declarator")){
                 return this.getTypeAndName(type+"[]", name, declaratorNode, sourceCode);
             }
-            else if(declaratorNode.getType().equals("identifier")){
+            else if(declaratorNode.getType().equals("identifier") || declaratorNode.getType().equals("field_identifier")){
                 name = ByteToString.byteArrayToString(sourceCode.getContent(), declaratorNode.getStartByte(), declaratorNode.getEndByte());
                 t.set(0, type); t.add(1, name);
                 return t;

@@ -87,6 +87,7 @@ public class TreeParserService {
         Map<String, Long> symbolIds = generatorIdentifier.symbolIds;
         PackageDTO packageDTO = null;
         BlockDTO[] parentBlockDTOList = new BlockDTO[node.getChildCount()];
+        boolean[] stopVisitAndBuild = new boolean[node.getChildCount()];
         for(int i=0; i<node.getChildCount(); i++)
         {
             Node childNode = node.getChild(i);
@@ -94,7 +95,9 @@ public class TreeParserService {
             if(PackageManager.isPackage(language, type)){
                 packageDTO = packageManager.buildPackage(symbolIds.get("package"), parentBlockDTO.getBlockId(), childNode, sourceCode);
                 symbolIds.put("package", symbolIds.get("package")+1);
+                System.out.println("packageDTO = " + packageDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = false;
             }
             else if(ClassManager.isClass(language, type)){
                 ClassDTO classDTO = classManager.buildClassDTO(symbolIds.get("class"),
@@ -102,14 +105,17 @@ public class TreeParserService {
                         childNode,
                         sourceCode);
                 symbolIds.put("class", symbolIds.get("class")+1);
+                System.out.println("classDTO = " + classDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
-
+                stopVisitAndBuild[i] = true;
             }
             else if(BlockManager.isBlock(language, type)){
                 BlockDTO blockDTO = blockManager.buildBlock(symbolIds.get("block"), parentBlockDTO.getDepth()+1,
                         parentBlockDTO.getBlockId(), node.getType(), node, parentBlockDTO.getSymbolReferenceId());
                 symbolIds.put("block", symbolIds.get("block")+1);
+                System.out.println("blockDTO = " + blockDTO);
                 parentBlockDTOList[i] = blockDTO;
+                stopVisitAndBuild[i] = true;
             }
 
             else if(VariableManager.isMemberVariableDecl(language, type)){
@@ -117,21 +123,29 @@ public class TreeParserService {
                 MemberVariableDeclarationDTO memberVarDeclDTO = variableManager.buildMemberVariableDeclDTO(symbolIds.get("member_var_decl"), parentBlockDTO.getBlockId(),
                         belongedClassDTO.getClassId(), childNode, sourceCode);
                 symbolIds.put("member_var_decl", symbolIds.get("member_var_decl") + 1);
+                System.out.println("memberVarDeclDTO = " + memberVarDeclDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = false;
             }
 
             else if(VariableManager.isStmtVariableDecl(language, type)){
                 StmtVariableDeclarationDTO stmtVarDecl = variableManager.buildStmtVariableDeclDTO(symbolIds.get("stmt_var_decl"), parentBlockDTO.getBlockId(), childNode, sourceCode);
                 symbolIds.put("stmt_var_decl", symbolIds.get("stmt_var_decl") + 1);
+                System.out.println("stmtVarDecl = " + stmtVarDecl);
                 parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = false;
             }
             else{
                 parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = true;
             }
         }
         for(int i=0; i<node.getChildCount(); i++){
             Node childNode = node.getChild(i);
-            visitAndBuild(childNode, symbolStatusId, sourceCode, parentBlockDTOList[i]);
+            if(stopVisitAndBuild[i])
+            {
+                visitAndBuild(childNode, symbolStatusId, sourceCode, parentBlockDTOList[i]);
+            }
         }
     }
 
