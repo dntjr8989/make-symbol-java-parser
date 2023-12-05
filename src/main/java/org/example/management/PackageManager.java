@@ -65,10 +65,10 @@ public class PackageManager {
 
         packageDTO.setPosition(
                 new Position(
-                        node.getStartPoint().getRow(),
-                        node.getStartPoint().getColumn(),
-                        node.getEndPoint().getRow(),
-                        node.getEndPoint().getColumn()));
+                        node.getStartPoint().getRow()+1,
+                        node.getStartPoint().getColumn()+1,
+                        node.getEndPoint().getRow()+1,
+                        node.getEndPoint().getColumn()+1));
 
         this.packageDTOList.add(packageDTO);
 

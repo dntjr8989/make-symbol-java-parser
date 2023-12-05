@@ -27,7 +27,7 @@ public class Game extends Object{
         this.gameStatus = GameStatus.PREPARING.getCode();
     }
     //플레이
-    public void play() {
+    public void play(String a, String b, String[] c) {
         init();
         while(!gameStatus.equals(GameStatus.END.getCode())) {
             output.printNewLine("컴퓨터: " + computer.getAnswer().toString());

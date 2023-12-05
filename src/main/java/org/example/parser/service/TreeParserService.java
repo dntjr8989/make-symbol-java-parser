@@ -7,18 +7,21 @@ import ai.serenade.treesitter.Tree;
 import org.dto.BlockDTO;
 import org.dto.ClassDTO;
 import org.dto.MemberVariableDeclarationDTO;
+import org.dto.MethodDeclarationDTO;
 import org.dto.PackageDTO;
 import org.dto.StmtVariableDeclarationDTO;
 import org.dto.SymbolReferenceDTO;
 import org.example.config.GeneratorIdentifier;
 import org.example.management.BlockManager;
 import org.example.management.ClassManager;
+import org.example.management.MethodManager;
 import org.example.management.PackageManager;
 import org.example.management.SymbolReferenceManager;
 import org.example.management.VariableManager;
 import org.example.sourceCode.SourceCode;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,7 @@ public class TreeParserService {
 
     private final VariableManager variableManager = new VariableManager();
 
+    private final MethodManager methodManager = new MethodManager();
 
     public List<SymbolReferenceDTO> getSymbolReferenceDTOList() {
         return symbolReferenceManager.getSymbolReferenceDTOList();
@@ -117,7 +121,6 @@ public class TreeParserService {
                 parentBlockDTOList[i] = blockDTO;
                 stopVisitAndBuild[i] = true;
             }
-
             else if(VariableManager.isMemberVariableDecl(language, type)){
                 ClassDTO belongedClassDTO = classManager.getClassDTOList().get(classManager.getClassDTOList().size() - 1);
                 MemberVariableDeclarationDTO memberVarDeclDTO = variableManager.buildMemberVariableDeclDTO(symbolIds.get("member_var_decl"), parentBlockDTO.getBlockId(),
@@ -127,13 +130,26 @@ public class TreeParserService {
                 parentBlockDTOList[i] = parentBlockDTO;
                 stopVisitAndBuild[i] = false;
             }
-
             else if(VariableManager.isStmtVariableDecl(language, type)){
                 StmtVariableDeclarationDTO stmtVarDecl = variableManager.buildStmtVariableDeclDTO(symbolIds.get("stmt_var_decl"), parentBlockDTO.getBlockId(), childNode, sourceCode);
                 symbolIds.put("stmt_var_decl", symbolIds.get("stmt_var_decl") + 1);
                 System.out.println("stmtVarDecl = " + stmtVarDecl);
                 parentBlockDTOList[i] = parentBlockDTO;
                 stopVisitAndBuild[i] = false;
+            }
+            else if(MethodManager.isMethodDecl(language, type)){
+                ClassDTO belongedClassDTO = new ClassDTO();
+                if(language.equals("java"))
+                {
+                    belongedClassDTO = classManager.getClassDTOList().get(classManager.getClassDTOList().size() - 1);
+                }
+                MethodDeclarationDTO methodDeclDTO = methodManager.buildMethodDeclaration(symbolIds.get("method_decl"),
+                        parentBlockDTO.getBlockId(),
+                        belongedClassDTO.getClassId(), childNode, generatorIdentifier, sourceCode);
+                symbolIds.put("method_decl", symbolIds.get("method_decl") + 1);
+                System.out.println("methodDeclDTO = " + methodDeclDTO);
+                parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = true;
             }
             else{
                 parentBlockDTOList[i] = parentBlockDTO;

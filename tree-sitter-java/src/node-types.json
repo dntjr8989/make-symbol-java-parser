@@ -1255,6 +1255,16 @@
           }
         ]
       },
+      "modifiers": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "modifiers",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1265,16 +1275,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "modifiers",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1346,6 +1346,16 @@
           }
         ]
       },
+      "modifiers": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "modifiers",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1378,13 +1388,9 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
-        {
-          "type": "modifiers",
-          "named": true
-        },
         {
           "type": "throws",
           "named": true
@@ -2479,6 +2485,16 @@
           }
         ]
       },
+      "modifiers": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "modifiers",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -2530,10 +2546,6 @@
         },
         {
           "type": "marker_annotation",
-          "named": true
-        },
-        {
-          "type": "modifiers",
           "named": true
         },
         {

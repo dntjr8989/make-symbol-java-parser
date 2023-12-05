@@ -113,10 +113,10 @@ public class VariableManager {
         variableDeclarationDTO.setInitializer(initializer);
         variableDeclarationDTO.setPosition(
                 new Position(
-                        node.getStartPoint().getRow(),
-                        node.getStartPoint().getColumn(),
-                        node.getEndPoint().getRow(),
-                        node.getEndPoint().getColumn()));
+                        node.getStartPoint().getRow()+1,
+                        node.getStartPoint().getColumn()+1,
+                        node.getEndPoint().getRow()+1,
+                        node.getEndPoint().getColumn()+1));
 
         memberVariableDeclarationDTOList.add(variableDeclarationDTO);
         return variableDeclarationDTO;
@@ -164,10 +164,10 @@ public class VariableManager {
         variableDeclarationDTO.setInitializer(initializer);
         variableDeclarationDTO.setPosition(
                 new Position(
-                        node.getStartPoint().getRow(),
-                        node.getStartPoint().getColumn(),
-                        node.getEndPoint().getRow(),
-                        node.getEndPoint().getColumn()));
+                        node.getStartPoint().getRow()+1,
+                        node.getStartPoint().getColumn()+1,
+                        node.getEndPoint().getRow()+1,
+                        node.getEndPoint().getColumn()+1));
 
         stmtVariableDeclarationDTOList.add(variableDeclarationDTO);
         return variableDeclarationDTO;
@@ -180,6 +180,9 @@ public class VariableManager {
         if(declaratorNode != null){
             if(declaratorNode.getType().equals("array_declarator")){
                 return this.getTypeAndName(type+"[]", name, declaratorNode, sourceCode);
+            }
+            else if(declaratorNode.getType().equals("pointer_declarator")){
+                return this.getTypeAndName(type+"*", name, declaratorNode, sourceCode);
             }
             else if(declaratorNode.getType().equals("identifier") || declaratorNode.getType().equals("field_identifier")){
                 name = ByteToString.byteArrayToString(sourceCode.getContent(), declaratorNode.getStartByte(), declaratorNode.getEndByte());
