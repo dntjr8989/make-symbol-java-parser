@@ -146,6 +146,94 @@ public class MethodManager {
         return methodDeclarationDTO;
     }
 
+    public MethodCallExprDTO buildMethodCallExpr(Long methodCallExprId, Long blockId, Node node, GeneratorIdentifier generatorIdentifier, SourceCode sourceCode) {
+
+        MethodCallExprDTO methodCallExprDTO = new MethodCallExprDTO();
+        List<ArgumentDTO> localArgumentDTOList = new ArrayList<>();
+
+        String methodName = "";
+        String varName = "";
+
+        //methodName, varName
+
+        //java
+        Node nameNode = node.getChildByFieldName("name");
+        if(nameNode!= null){
+            methodName = ByteToString.byteArrayToString(sourceCode.getContent(), nameNode.getStartByte(), nameNode.getEndByte());
+        }
+        Node objectNode = node.getChildByFieldName("object");
+        if(objectNode!=null){
+            varName = ByteToString.byteArrayToString(sourceCode.getContent(), objectNode.getStartByte(), objectNode.getEndByte());
+        }
+
+        //c
+        Node functionNode = node.getChildByFieldName("function");
+        if(functionNode!= null){
+            Node argumentNode = functionNode.getChildByFieldName("argument");
+            if(argumentNode != null){
+                varName = ByteToString.byteArrayToString(sourceCode.getContent(), argumentNode.getStartByte(), argumentNode.getEndByte());
+            }
+            Node fieldNode = functionNode.getChildByFieldName("field");
+            if(fieldNode != null){
+                methodName = ByteToString.byteArrayToString(sourceCode.getContent(), fieldNode.getStartByte(), fieldNode.getEndByte());
+            }
+            else{
+                methodName = ByteToString.byteArrayToString(sourceCode.getContent(), functionNode.getStartByte(), functionNode.getEndByte());
+            }
+        }
+
+        //argument
+        this.findArguments(node, sourceCode, localArgumentDTOList, methodCallExprId, generatorIdentifier);
+
+        methodCallExprDTO.setPosition(
+                new Position(
+                        node.getStartPoint().getRow()+1,
+                        node.getStartPoint().getColumn()+1,
+                        node.getEndPoint().getRow()+1,
+                        node.getEndPoint().getColumn()+1));
+
+        methodCallExprDTO.setMethodCallExprId(methodCallExprId);
+        methodCallExprDTO.setBlockId(blockId);
+        methodCallExprDTO.setName(methodName);
+        methodCallExprDTO.setArguments(localArgumentDTOList);
+        methodCallExprDTO.setNameExpr(varName);
+
+        methodCallExprDTOList.add(methodCallExprDTO);
+        return methodCallExprDTO;
+    }
+
+    private void findArguments(Node node, SourceCode sourceCode, List<ArgumentDTO> localArgumentDTOList, Long methodCallExprId, GeneratorIdentifier generatorIdentifier){
+        Map<String, Long> symbolIds = generatorIdentifier.getSymbolIds();
+        int argumentIndex = 1;
+        Node argumentsNode = node.getChildByFieldName("arguments");
+        if(argumentsNode != null){
+            for(int i=0; i< argumentsNode.getChildCount(); i++){
+                Node argumentNode = argumentsNode.getChild(i);
+                if(argumentNode.getType().equals("(") || argumentNode.getType().equals(")") || argumentNode.getType().equals(",")){
+                    continue;
+                }
+                String argumentName = ByteToString.byteArrayToString(sourceCode.getContent(), argumentNode.getStartByte(), argumentNode.getEndByte());
+                String argumentType = argumentNode.getType();
+
+                ArgumentDTO argumentDTO = new ArgumentDTO();
+                argumentDTO.setIndex(argumentIndex++);
+                argumentDTO.setName(argumentName);
+                argumentDTO.setArgumentId(symbolIds.get("argument"));
+                symbolIds.put("argument", symbolIds.get("argument") + 1);
+                argumentDTO.setMethodCallExprId(methodCallExprId);
+                // 임시로 Node Type 으로 저장
+                argumentDTO.setType(argumentType);
+                argumentDTO.setPosition(
+                        new Position(
+                                argumentNode.getStartPoint().getRow()+1,
+                                argumentNode.getStartPoint().getColumn()+1,
+                                argumentNode.getEndPoint().getRow()+1,
+                                argumentNode.getEndPoint().getColumn()+1));
+                argumentDTOList.add(argumentDTO);
+                localArgumentDTOList.add(argumentDTO);
+            }
+        }
+    }
     private void findReturnMapper(Node node, SourceCode sourceCode, ReturnMapperDTO returnMapperDTO, Long methodDeclarationId, GeneratorIdentifier generatorIdentifier){
 
         Node returnTypeNode = node.getChildByFieldName("type");

@@ -15,7 +15,7 @@ public class Input {
         if(!code.matches("[1-2]+")) {
             throw new IllegalArgumentException();
         }
-        return Integer.parseInt(code);
+        return Integer.parseInt(code, a, b);
     }
 
     // [refactor] 책임 분리 - input -> player -> game

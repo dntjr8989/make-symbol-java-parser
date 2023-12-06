@@ -7,6 +7,7 @@ import ai.serenade.treesitter.Tree;
 import org.dto.BlockDTO;
 import org.dto.ClassDTO;
 import org.dto.MemberVariableDeclarationDTO;
+import org.dto.MethodCallExprDTO;
 import org.dto.MethodDeclarationDTO;
 import org.dto.PackageDTO;
 import org.dto.StmtVariableDeclarationDTO;
@@ -101,7 +102,7 @@ public class TreeParserService {
                 symbolIds.put("package", symbolIds.get("package")+1);
                 System.out.println("packageDTO = " + packageDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
-                stopVisitAndBuild[i] = false;
+                stopVisitAndBuild[i] = true;
             }
             else if(ClassManager.isClass(language, type)){
                 ClassDTO classDTO = classManager.buildClassDTO(symbolIds.get("class"),
@@ -111,7 +112,7 @@ public class TreeParserService {
                 symbolIds.put("class", symbolIds.get("class")+1);
                 System.out.println("classDTO = " + classDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
-                stopVisitAndBuild[i] = true;
+                stopVisitAndBuild[i] = false;
             }
             else if(BlockManager.isBlock(language, type)){
                 BlockDTO blockDTO = blockManager.buildBlock(symbolIds.get("block"), parentBlockDTO.getDepth()+1,
@@ -119,7 +120,7 @@ public class TreeParserService {
                 symbolIds.put("block", symbolIds.get("block")+1);
                 System.out.println("blockDTO = " + blockDTO);
                 parentBlockDTOList[i] = blockDTO;
-                stopVisitAndBuild[i] = true;
+                stopVisitAndBuild[i] = false;
             }
             else if(VariableManager.isMemberVariableDecl(language, type)){
                 ClassDTO belongedClassDTO = classManager.getClassDTOList().get(classManager.getClassDTOList().size() - 1);
@@ -128,14 +129,14 @@ public class TreeParserService {
                 symbolIds.put("member_var_decl", symbolIds.get("member_var_decl") + 1);
                 System.out.println("memberVarDeclDTO = " + memberVarDeclDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
-                stopVisitAndBuild[i] = false;
+                stopVisitAndBuild[i] = true;
             }
             else if(VariableManager.isStmtVariableDecl(language, type)){
                 StmtVariableDeclarationDTO stmtVarDecl = variableManager.buildStmtVariableDeclDTO(symbolIds.get("stmt_var_decl"), parentBlockDTO.getBlockId(), childNode, sourceCode);
                 symbolIds.put("stmt_var_decl", symbolIds.get("stmt_var_decl") + 1);
                 System.out.println("stmtVarDecl = " + stmtVarDecl);
                 parentBlockDTOList[i] = parentBlockDTO;
-                stopVisitAndBuild[i] = false;
+                stopVisitAndBuild[i] = true;
             }
             else if(MethodManager.isMethodDecl(language, type)){
                 ClassDTO belongedClassDTO = new ClassDTO();
@@ -149,16 +150,24 @@ public class TreeParserService {
                 symbolIds.put("method_decl", symbolIds.get("method_decl") + 1);
                 System.out.println("methodDeclDTO = " + methodDeclDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = false;
+            }
+            else if(MethodManager.isMethodCallExpr(language, type)){
+                MethodCallExprDTO methodCallExprDTO = methodManager.buildMethodCallExpr(symbolIds.get("method_call_expr"),
+                        parentBlockDTO.getBlockId(), childNode, generatorIdentifier, sourceCode);
+                symbolIds.put("method_call_expr", symbolIds.get("method_call_expr") + 1);
+                System.out.println("methodCallExprDTO = " + methodCallExprDTO);
+                parentBlockDTOList[i] = parentBlockDTO;
                 stopVisitAndBuild[i] = true;
             }
             else{
                 parentBlockDTOList[i] = parentBlockDTO;
-                stopVisitAndBuild[i] = true;
+                stopVisitAndBuild[i] = false;
             }
         }
         for(int i=0; i<node.getChildCount(); i++){
             Node childNode = node.getChild(i);
-            if(stopVisitAndBuild[i])
+            if(!stopVisitAndBuild[i])
             {
                 visitAndBuild(childNode, symbolStatusId, sourceCode, parentBlockDTOList[i]);
             }
