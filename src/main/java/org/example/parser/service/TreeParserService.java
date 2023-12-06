@@ -6,6 +6,7 @@ import ai.serenade.treesitter.Parser;
 import ai.serenade.treesitter.Tree;
 import org.dto.BlockDTO;
 import org.dto.ClassDTO;
+import org.dto.ImportDTO;
 import org.dto.MemberVariableDeclarationDTO;
 import org.dto.MethodCallExprDTO;
 import org.dto.MethodDeclarationDTO;
@@ -15,6 +16,7 @@ import org.dto.SymbolReferenceDTO;
 import org.example.config.GeneratorIdentifier;
 import org.example.management.BlockManager;
 import org.example.management.ClassManager;
+import org.example.management.ImportManager;
 import org.example.management.MethodManager;
 import org.example.management.PackageManager;
 import org.example.management.SymbolReferenceManager;
@@ -44,6 +46,8 @@ public class TreeParserService {
 
     private final MethodManager methodManager = new MethodManager();
 
+    private final ImportManager importManager = new ImportManager();
+
     public List<SymbolReferenceDTO> getSymbolReferenceDTOList() {
         return symbolReferenceManager.getSymbolReferenceDTOList();
     }
@@ -59,9 +63,13 @@ public class TreeParserService {
         return packageManager.getPackageDTOList();
     }
 
-    public List<MemberVariableDeclarationDTO> getMemberVariableDeclarationDTO(){return variableManager.getMemberVariableDeclarationDTOList();}
+    public List<MemberVariableDeclarationDTO> getMemberVariableDeclarationDTOList(){return variableManager.getMemberVariableDeclarationDTOList();}
 
-    public List<StmtVariableDeclarationDTO> getStmtVariableDeclarationDTO(){return variableManager.getStmtVariableDeclarationDTOList();}
+    public List<StmtVariableDeclarationDTO> getStmtVariableDeclarationDTOList(){return variableManager.getStmtVariableDeclarationDTOList();}
+
+    public List<MethodDeclarationDTO> getMethodDeclarationDTOList(){return  methodManager.getMethodDeclarationDTOList();}
+
+    public List<MethodCallExprDTO> getMethodCallExprDTOList(){return methodManager.getMethodCallExprDTOList();}
 
     public void makeSymbol(Long symbolStatusId, SourceCode sourceCode) throws UnsupportedEncodingException {
 
@@ -97,7 +105,14 @@ public class TreeParserService {
         {
             Node childNode = node.getChild(i);
             String language = sourceCode.getLanguage(); String type = childNode.getType();
-            if(PackageManager.isPackage(language, type)){
+            if(ImportManager.isImport(language, type)){
+                ImportDTO importDTO = importManager.buildImport(symbolIds.get("import"), parentBlockDTO.getBlockId(), childNode, sourceCode);
+                symbolIds.put("import", symbolIds.get("import") + 1);
+                System.out.println("importDTO = " + importDTO);
+                parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = true;
+            }
+            else if(PackageManager.isPackage(language, type)){
                 packageDTO = packageManager.buildPackage(symbolIds.get("package"), parentBlockDTO.getBlockId(), childNode, sourceCode);
                 symbolIds.put("package", symbolIds.get("package")+1);
                 System.out.println("packageDTO = " + packageDTO);

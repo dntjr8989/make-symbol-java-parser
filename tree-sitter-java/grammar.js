@@ -725,12 +725,17 @@ module.exports = grammar({
       ';'
     ),
 
+    //Path 추가
     import_declaration: $ => seq(
       'import',
       optional('static'),
-      $._name,
-      optional(seq('.', $.asterisk)),
+      field('path', $.path),
       ';'
+    ),
+
+    path : $ => seq(
+        $._name,
+        optional(seq('.', $.asterisk))
     ),
 
     asterisk: $ => '*',

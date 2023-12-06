@@ -32,6 +32,14 @@ public class ClassManager {
         this.classDTOList.clear();
     }
 
+    public static boolean isClass(String language, String nodeType){
+        if(!classTypeMap.containsKey(language)){
+            return false;
+        }
+        List<String> nodeTypeList = classTypeMap.get(language);
+        return nodeTypeList.contains(nodeType);
+    }
+
     public ClassDTO buildClassDTO(Long classId, Long blockId, Long packageId, Node node, SourceCode sourceCode){
         ClassDTO classDTO = new ClassDTO();
 
@@ -92,14 +100,6 @@ public class ClassManager {
         this.classDTOList.add(classDTO);
 
         return classDTO;
-    }
-
-    public static boolean isClass(String language, String nodeType){
-        if(!classTypeMap.containsKey(language)){
-            return false;
-        }
-        List<String> nodeTypeList = classTypeMap.get(language);
-        return nodeTypeList.contains(nodeType);
     }
 
 }
