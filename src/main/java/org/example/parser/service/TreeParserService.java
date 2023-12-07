@@ -4,6 +4,7 @@ import ai.serenade.treesitter.Languages;
 import ai.serenade.treesitter.Node;
 import ai.serenade.treesitter.Parser;
 import ai.serenade.treesitter.Tree;
+import org.dto.AssignExprDTO;
 import org.dto.BlockDTO;
 import org.dto.ClassDTO;
 import org.dto.ImportDTO;
@@ -16,6 +17,7 @@ import org.dto.SymbolReferenceDTO;
 import org.example.config.GeneratorIdentifier;
 import org.example.management.BlockManager;
 import org.example.management.ClassManager;
+import org.example.management.ExprManager;
 import org.example.management.ImportManager;
 import org.example.management.MethodManager;
 import org.example.management.PackageManager;
@@ -48,6 +50,8 @@ public class TreeParserService {
 
     private final ImportManager importManager = new ImportManager();
 
+    private final ExprManager exprManager = new ExprManager();
+
     public List<SymbolReferenceDTO> getSymbolReferenceDTOList() {
         return symbolReferenceManager.getSymbolReferenceDTOList();
     }
@@ -70,6 +74,8 @@ public class TreeParserService {
     public List<MethodDeclarationDTO> getMethodDeclarationDTOList(){return  methodManager.getMethodDeclarationDTOList();}
 
     public List<MethodCallExprDTO> getMethodCallExprDTOList(){return methodManager.getMethodCallExprDTOList();}
+
+    public List<AssignExprDTO> getAssignExprDTOList(){return exprManager.getAssignExprDTOList();}
 
     public void makeSymbol(Long symbolStatusId, SourceCode sourceCode) throws UnsupportedEncodingException {
 
@@ -174,6 +180,13 @@ public class TreeParserService {
                 System.out.println("methodCallExprDTO = " + methodCallExprDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
                 stopVisitAndBuild[i] = true;
+            }
+            else if(ExprManager.isAssignExpr(language, type)){
+                AssignExprDTO assignExprDTO = exprManager.buildAssignExpr(symbolIds.get("assign_expr"), parentBlockDTO.getBlockId(), childNode, sourceCode);
+                symbolIds.put("assign_expr", symbolIds.get("assign_expr") + 1);
+                System.out.println("assignExprDTO = " + assignExprDTO);
+                parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = false;
             }
             else{
                 parentBlockDTOList[i] = parentBlockDTO;
