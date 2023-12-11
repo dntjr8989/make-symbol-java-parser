@@ -777,7 +777,7 @@ module.exports = grammar({
 
     return_statement: $ => seq(
       'return',
-      optional(choice($._expression, $.comma_expression)),
+      field("expression", optional(choice($._expression, $.comma_expression))), //필드 네임 추가
       ';',
     ),
 

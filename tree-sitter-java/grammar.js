@@ -480,7 +480,7 @@ module.exports = grammar({
 
     return_statement: $ => seq(
       'return',
-      optional($.expression),
+      field("expression", optional($.expression)), //필드네임 추가
       ';'
     ),
 

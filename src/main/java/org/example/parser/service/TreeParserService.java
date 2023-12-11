@@ -12,6 +12,7 @@ import org.dto.MemberVariableDeclarationDTO;
 import org.dto.MethodCallExprDTO;
 import org.dto.MethodDeclarationDTO;
 import org.dto.PackageDTO;
+import org.dto.ReturnStmtDTO;
 import org.dto.StmtVariableDeclarationDTO;
 import org.dto.SymbolReferenceDTO;
 import org.example.config.GeneratorIdentifier;
@@ -21,6 +22,7 @@ import org.example.management.ExprManager;
 import org.example.management.ImportManager;
 import org.example.management.MethodManager;
 import org.example.management.PackageManager;
+import org.example.management.ReturnStmtManager;
 import org.example.management.SymbolReferenceManager;
 import org.example.management.VariableManager;
 import org.example.sourceCode.SourceCode;
@@ -52,6 +54,8 @@ public class TreeParserService {
 
     private final ExprManager exprManager = new ExprManager();
 
+    private final ReturnStmtManager returnStmtManager = new ReturnStmtManager();
+
     public List<SymbolReferenceDTO> getSymbolReferenceDTOList() {
         return symbolReferenceManager.getSymbolReferenceDTOList();
     }
@@ -76,6 +80,8 @@ public class TreeParserService {
     public List<MethodCallExprDTO> getMethodCallExprDTOList(){return methodManager.getMethodCallExprDTOList();}
 
     public List<AssignExprDTO> getAssignExprDTOList(){return exprManager.getAssignExprDTOList();}
+
+    public List<ReturnStmtDTO> getReturnStmtDTOList(){return returnStmtManager.getReturnStmtDTOList();}
 
     public void makeSymbol(Long symbolStatusId, SourceCode sourceCode) throws UnsupportedEncodingException {
 
@@ -187,6 +193,13 @@ public class TreeParserService {
                 System.out.println("assignExprDTO = " + assignExprDTO);
                 parentBlockDTOList[i] = parentBlockDTO;
                 stopVisitAndBuild[i] = false;
+            }
+            else if(ReturnStmtManager.isReturnStmt(language, type)){
+                ReturnStmtDTO returnStmtDTO = returnStmtManager.buildReturnStmt(symbolIds.get("return_stmt"), parentBlockDTO.getBlockId(), childNode, sourceCode);
+                symbolIds.put("return_stmt", symbolIds.get("return_stmt")+1);
+                System.out.println("returnStmtDTO = " + returnStmtDTO);
+                parentBlockDTOList[i] = parentBlockDTO;
+                stopVisitAndBuild[i] = true;
             }
             else{
                 parentBlockDTOList[i] = parentBlockDTO;

@@ -26,6 +26,7 @@ public class GeneratorIdentifier {
         firstSymbolIds.put("return_mapper", 0L);
         firstSymbolIds.put("method_call_expr", 0L);
         firstSymbolIds.put("assign_expr", 0L);
+        firstSymbolIds.put("return_stmt", 0L);
         firstSymbolIds.put("full_qualified_name", 0L);
     }
 
@@ -45,6 +46,7 @@ public class GeneratorIdentifier {
         symbolIds.put("return_mapper", 0L);
         symbolIds.put("method_call_expr", 0L);
         symbolIds.put("assign_expr", 0L);
+        symbolIds.put("return_stmt", 0L);
         symbolIds.put("full_qualified_name", 0L);
     }
 
